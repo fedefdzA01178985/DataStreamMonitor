@@ -1,126 +1,126 @@
 # Data Stream Monitor
 
-Simulador de un sistema de monitoreo de recursos de cómputo (CPU, memoria RAM y tráfico de red), inspirado en herramientas como el Administrador de Tareas. El sistema aplica umbrales configurables por componente y genera alertas automáticas cuando alguno de ellos se excede.
+A simulated computer resource monitoring system (CPU, RAM, and network traffic), inspired by tools like the Task Manager. The system applies configurable thresholds per component and automatically generates alerts whenever one of them is exceeded.
 
-> Proyecto desarrollado para la materia **Programación Orientada a Objetos (TC1030.306)** — Tecnológico de Monterrey.
+> Project developed for the course **Object-Oriented Programming (TC1030.306)** — Tecnológico de Monterrey.
 
-## Descripción
+## Description
 
-En entornos con producción de software o centros de datos, monitorear el estado de los recursos del sistema es indispensable para garantizar el máximo rendimiento posible. **Data Stream Monitor** simula ese proceso: administra distintos sensores (CPU, memoria y red), cada uno con un umbral configurado por un administrador, y evalúa continuamente si el valor medido supera dicho umbral. Cuando esto ocurre, se genera una alerta con nivel de criticidad, mensaje y valor registrado.
+In environments involving software production or data centers, monitoring system resources is essential to ensure maximum performance. **Data Stream Monitor** simulates that process: it manages different sensors (CPU, memory, and network), each with a threshold configured by an administrator, and continuously evaluates whether the measured value exceeds that threshold. When this happens, an alert is generated with a criticality level, message, and recorded value.
 
-Por limitaciones de alcance del proyecto, los datos se generan de forma simulada (aleatoria) en lugar de leerse de hardware real; sin embargo, el diseño está pensado para poder extenderse a mediciones reales en el futuro sin modificar la lógica central del sistema.
+Due to the project's scope, data is randomly simulated rather than read from real hardware; however, the design is intended to be extendable to real measurements in the future without modifying the system's core logic.
 
-## Funcionalidades
+## Features
 
-- Monitoreo de tres tipos de componentes: **CPU**, **Memoria RAM** y **Red**.
-- Umbrales configurables de forma independiente para cada sensor.
-- Generación automática de alertas cuando un valor medido supera su umbral.
-- Reporte de alertas por sistema, incluyendo nivel, mensaje y valor registrado.
-- Comparación de sensores mediante sobrecarga del operador `==`.
-- Simulación polimórfica de múltiples sensores gestionados por una sola clase `Monitor`.
+- Monitoring of three component types: **CPU**, **RAM**, and **Network**.
+- Independently configurable thresholds for each sensor.
+- Automatic alert generation whenever a measured value exceeds its threshold.
+- Alert reporting per system, including level, message, and recorded value.
+- Sensor comparison via overloading of the `==` operator.
+- Polymorphic simulation of multiple sensors managed by a single `Monitor` class.
 
-## Diseño orientado a objetos
+## Object-Oriented Design
 
-El proyecto aplica los pilares fundamentales de POO en C++:
+The project applies the core pillars of OOP in C++:
 
-| Concepto | Aplicación en el proyecto |
+| Concept | Application in the project |
 |---|---|
-| **Clases abstractas** | `Sensor` es una clase abstracta con la función virtual pura `medirMetrica()`, lo que impide instanciar un sensor genérico y obliga a cada subclase a implementar su propia lógica de medición. |
-| **Herencia** | `SensorCPU`, `SensorMemoria` y `SensorRed` heredan públicamente de `Sensor`, reutilizando atributos y métodos comunes (nombre, umbral, valor actual). |
-| **Polimorfismo** | `Monitor` almacena punteros a `Sensor` y ejecuta `medirMetrica()` sobre cada uno sin conocer su tipo concreto; la vtable de C++ resuelve la llamada correcta en tiempo de ejecución. |
-| **Composición** | `Monitor` contiene arreglos de `Sensor` y `Alerta` (no hereda de ellos), respetando el principio de "componer antes que heredar". |
-| **Encapsulamiento** | Atributos como `nombre`, `umbral`, `valorActual`, `cargaCPU`, `memoriaUsada` y `trafico` son privados, accesibles solo mediante getters/setters. |
-| **Sobrecarga de operadores** | `operator==` implementado en `SensorCPU`, `SensorMemoria` y `Alerta` para comparar objetos según criterios específicos de igualdad. |
+| **Abstract classes** | `Sensor` is an abstract class with the pure virtual function `medirMetrica()`, which prevents instantiating a generic sensor and forces each subclass to implement its own measurement logic. |
+| **Inheritance** | `SensorCPU`, `SensorMemoria`, and `SensorRed` publicly inherit from `Sensor`, reusing common attributes and methods (name, threshold, current value). |
+| **Polymorphism** | `Monitor` stores pointers to `Sensor` and calls `medirMetrica()` on each one without knowing its concrete type; C++'s vtable resolves the correct call at runtime. |
+| **Composition** | `Monitor` contains arrays of `Sensor` and `Alerta` (it does not inherit from them), following the "compose over inherit" principle. |
+| **Encapsulation** | Attributes such as `nombre`, `umbral`, `valorActual`, `cargaCPU`, `memoriaUsada`, and `trafico` are private, accessible only through getters/setters. |
+| **Operator overloading** | `operator==` is implemented in `SensorCPU`, `SensorMemoria`, and `Alerta` to compare objects based on specific equality criteria. |
 
-### Diagrama de clases (UML)
+### Class Diagram (UML)
 
-![Diagrama UML](DiagramaUML.png)
+![UML Diagram](DiagramaUML.png)
 
-### Clases principales
+### Main Classes
 
-| Clase | Función |
+| Class | Function |
 |---|---|
-| `Sensor` (abstracta) | Modelo base para cualquier sensor derivado; define la interfaz común. |
-| `SensorCPU` | Simula y reporta el porcentaje de uso de CPU. |
-| `SensorMemoria` | Simula y reporta el porcentaje de uso de RAM. |
-| `SensorRed` | Simula y reporta el tráfico de red en MB/s. |
-| `Alerta` | Encapsula un evento de umbral superado (nivel, mensaje, valor). |
-| `Monitor` | Administra los sensores, ejecuta ciclos de monitoreo y genera reportes de alertas. |
+| `Sensor` (abstract) | Base model for any derived sensor; defines the common interface. |
+| `SensorCPU` | Simulates and reports CPU usage percentage. |
+| `SensorMemoria` | Simulates and reports RAM usage percentage. |
+| `SensorRed` | Simulates and reports network traffic in MB/s. |
+| `Alerta` | Encapsulates a threshold-exceeded event (level, message, value). |
+| `Monitor` | Manages the sensors, runs monitoring cycles, and generates alert reports. |
 
-## Ejemplo de ejecución
+## Example Run
 
 ```
 ====================================================
                 DATA STREAM MONITOR
 ====================================================
 
->>> CASO 1: Creando objetos derivados y mostrando datos
-Datos iniciales de los sensores:
-Sensor CPU -> Carga Actual: 37% | Umbral Configurado: 75%
-Sensor Memoria -> RAM Usada: 32% | Umbral Configurado: 80%
-Sensor Red -> Trafico Actual: 21 MB/s | Umbral Configurado: 50 MB/s
+>>> CASE 1: Creating derived objects and displaying data
+Initial sensor data:
+CPU Sensor -> Current Load: 37% | Configured Threshold: 75%
+Memory Sensor -> RAM Used: 32% | Configured Threshold: 80%
+Network Sensor -> Current Traffic: 21 MB/s | Configured Threshold: 50 MB/s
 ----------------------------------------------------
 
->>> CASO 2: Calculando metricas con metodos sobrescritos (.medirMetrica())
-Metrica calculada individualmente para CPU: 50%
-Metrica calculada individualmente para RAM: 60%
+>>> CASE 2: Calculating metrics with overridden methods (.medirMetrica())
+Metric individually calculated for CPU: 50%
+Metric individually calculated for RAM: 60%
 ----------------------------------------------------
 
->>> CASO 3: Demostrando polimorfismo con el Monitor
-=== Ejecutando ciclo de monitoreo para: Server-DataCenter-01 ===
-Sensor [CPU] midio: 64
-Sensor [Memoria] midio: 95
- -> ALERTA GENERADA en Memoria!
-Sensor [Red] midio: 43
+>>> CASE 3: Demonstrating polymorphism with the Monitor
+=== Running monitoring cycle for: Server-DataCenter-01 ===
+Sensor [CPU] measured: 64
+Sensor [Memory] measured: 95
+ -> ALERT GENERATED in Memory!
+Sensor [Network] measured: 43
 ====================================================
 
-======  REPORTE DE ALERTAS - SISTEMA: Server-DataCenter-01  ======
-Total de alertas registradas: 2
-Alerta 1 -> Nivel: CRITICO | Mensaje: El valor supero el umbral tolerado | Valor: 95
-Alerta 2 -> Nivel: CRITICO | Mensaje: El valor supero el umbral tolerado | Valor: 86
+======  ALERT REPORT - SYSTEM: Server-DataCenter-01  ======
+Total alerts registered: 2
+Alert 1 -> Level: CRITICAL | Message: Value exceeded the tolerated threshold | Value: 95
+Alert 2 -> Level: CRITICAL | Message: Value exceeded the tolerated threshold | Value: 86
 ============================================================
 
->>> CASO 4: Usando la sobrecarga de operadores (==)
-Comparando si cpuA tiene la misma carga actual que cpuB...
-Resultado: Los sensores de CPU tienen cargas distintas actuales.
+>>> CASE 4: Using operator overloading (==)
+Comparing whether cpuA has the same current load as cpuB...
+Result: The CPU sensors have different current loads.
 ====================================================
 Process finished with exit code 0
 ```
 
-## Cómo compilar y ejecutar
+## How to Build and Run
 
-Este proyecto usa **CMake** y fue desarrollado en **CLion**.
+This project uses **CMake** and was developed in **CLion**.
 
-### Requisitos
-- Compilador compatible con C++11 o superior (g++, clang, MSVC)
-- CMake 3.10 o superior
+### Requirements
+- A C++11-compatible compiler or higher (g++, clang, MSVC)
+- CMake 3.10 or higher
 
-### Pasos
+### Steps
 
 ```bash
-git clone https://github.com/TU-USUARIO/DataStreamMonitor.git
+git clone https://github.com/fedefdzA01178985
 cd DataStreamMonitor
 mkdir build
 cd build
 cmake ..
 cmake --build .
-./Evidencia2      # o Evidencia2.exe en Windows
+./Evidencia2      # or Evidencia2.exe on Windows
 ```
 
-## Limitaciones conocidas
+## Known Limitations
 
-- Los sensores se almacenan en un arreglo estático de tamaño fijo (`Sensor*[10]`); si se intentan registrar 10 o más sensores, el sistema genera un error.
-- Las alertas se almacenan en un arreglo estático (`Alerta[50]`); al superar las 50 alertas registradas, las nuevas dejan de guardarse.
-- Los datos de los sensores son simulados con valores generados aleatoriamente; no se conectan a hardware real.
+- Sensors are stored in a fixed-size static array (`Sensor*[10]`); attempting to register 10 or more sensors causes an error.
+- Alerts are stored in a static array (`Alerta[50]`); once 50 alerts have been registered, new ones stop being saved.
+- Sensor data is randomly simulated; it is not connected to real hardware.
 
-## Posibles mejoras futuras
+## Possible Future Improvements
 
-- Sustituir los arreglos estáticos por `std::vector` para eliminar los límites fijos de sensores y alertas.
-- Integrar lectura de datos reales del sistema en lugar de valores simulados.
-- Adaptar el sistema para monitorear múltiples computadoras de una red o compañía en tiempo real.
+- Replace static arrays with `std::vector` to remove fixed limits on sensors and alerts.
+- Integrate real system data reading instead of simulated values.
+- Adapt the system to monitor multiple computers across a network or company in real time.
 
-## Autor
+## Author
 
 **Federico Manuel Fernández Peña**
-Proyecto Integrador — Programación Orientada a Objetos (TC1030.306)
+Integrative Project — Object-Oriented Programming (TC1030.306)
 Tecnológico de Monterrey
