@@ -98,12 +98,13 @@ This project uses **CMake** and was developed in **CLion**.
 ### Steps
 
 ```bash
-git clone https://github.com/fedefdzA01178985
+git clone https://github.com/fedefdzA01178985/DataStreamMonitor.git 
 cd DataStreamMonitor
 mkdir build
 cd build
 cmake ..
-cmake --build .
+cmake --build . --config Release
+cd Release
 ./Evidencia2      # or Evidencia2.exe on Windows
 ```
 
